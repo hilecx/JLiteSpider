@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,6 +41,8 @@ public class Network {
 	private String proxy = null;
 	/*线程池的线程数目*/
 	private int threadPoolSize = 3;
+
+    private String jsessionId;
 	
 	public static Network create() {
 		return new Network();
@@ -78,30 +81,64 @@ public class Network {
 		this.threadPoolSize = size;
 		return this;
 	}
-	/**
+
+    public String getJsessionId() {
+        return jsessionId;
+    }
+
+    public void setJsessionId(String jsessionId) {
+        this.jsessionId = jsessionId;
+    }
+
+    /**
 	 * 下载，并返回string
 	 * **/
-	private String downloader(String url) {
-		String res = "";
-		try {
-			Request rq = Request.Get(url).connectTimeout(this.timeout);
-			if (this.agent != null)
-				rq = rq.userAgent(this.agent);
-			if (this.cookie != null)
-				rq = rq.addHeader("Cookie", this.cookie);
-			if (this.proxy != null)
-				rq = rq.viaProxy(this.proxy);
-			res = rq.execute().returnContent().asString();
-			
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return res;
-	}
+//	private String downloader(String url) {
+//		String res = "";
+//		try {
+//			Request rq = Request.Get(url).connectTimeout(this.timeout);
+//			if (this.agent != null)
+//				rq = rq.userAgent(this.agent);
+//			if (this.cookie != null)
+//				rq = rq.addHeader("Cookie", this.cookie);
+//            if (this.jsessionId != null)
+//				rq = rq.addHeader("JSESSIONID", this.jsessionId);
+//			if (this.proxy != null)
+//				rq = rq.viaProxy(this.proxy);
+//			res = rq.execute().returnContent().asString();
+//
+//		} catch (ClientProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return res;
+//	}
+    private String downloader(String url) {
+        String res = "";
+        try {
+            Request rq = Request.Get(url).connectTimeout(this.timeout);
+            if (this.agent != null)
+                rq = rq.userAgent(this.agent);
+            if (this.cookie != null)
+                rq = rq.addHeader("Cookie", this.cookie);
+//            if (this.jsessionId != null)
+//                rq = rq.addHeader("JSESSIONID", this.jsessionId);
+            if (this.proxy != null)
+                rq = rq.viaProxy(this.proxy);
+            res = rq.execute().returnContent().asString();
+
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return res;
+    }
 	/**
 	 * 开始
 	 * **/
@@ -117,7 +154,14 @@ public class Network {
 			final Network tmp = this;
 			ExecutorService pool = Executors.newFixedThreadPool(this.threadPoolSize);
 			for (String each : urls) {
-				final String tmpeach = each;
+                int i = new Random().nextInt(1000);
+                try {
+                    System.out.println("sleep for: "+ i);
+                    Thread.sleep(new Long(i));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                final String tmpeach = each;
 				pool.execute(new Runnable() {
 					public void run() {
 						// TODO Auto-generated method stub

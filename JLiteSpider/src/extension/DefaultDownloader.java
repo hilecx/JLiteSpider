@@ -21,8 +21,14 @@ public class DefaultDownloader implements Downloader<String, String> {
 	private String proxy = null;
 	/*线程池的线程数目*/
 	private int threadPoolSize = 3;
-	
-	/**
+
+    private String jsessionId;
+
+    public String getJsessionId() {
+        return jsessionId;
+    }
+
+    /**
 	 * 设置下载传输参数
 	 * **/
 	public DefaultDownloader setUserAgent(String s) {
@@ -42,9 +48,13 @@ public class DefaultDownloader implements Downloader<String, String> {
 		return this;
 	}
 	public DefaultDownloader setThreadPoolSize(int size) {
-		this.threadPoolSize = size;
-		return this;
-	}
+        this.threadPoolSize = size;
+        return this;
+    }
+    public DefaultDownloader setJsessionId(String  jsessionId) {
+        this.jsessionId = jsessionId;
+        return this;
+    }
 	/**
 	 * 使用UrlList对象中的url，开始下载
 	 * **/
@@ -56,7 +66,8 @@ public class DefaultDownloader implements Downloader<String, String> {
 			nw.setCookie(this.cookie);
 		if (this.proxy != null)
 			nw.setProxy(this.proxy);
-		
+        if (this.jsessionId != null)
+            nw.setJsessionId(this.jsessionId);
 		return nw.setTimeout(this.timeout)
 				.setThreadPoolSize(this.threadPoolSize)
 				.begin().toStringList();
